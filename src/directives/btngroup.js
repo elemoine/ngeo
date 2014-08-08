@@ -48,13 +48,13 @@ goModule.directive('goBtnGroup', function() {
                */
               function(scope, element, attrs, ctrls) {
 
-                var options = /** @type {gox.BtnOptions|undefined} */
-                    (scope.$eval(attrs['goBtn'])) || {};
+                var options = scope.$eval(attrs['goBtn']);
+                var btnOptions = /** @type {gox.BtnOptions} */
+                    (goog.isDef(options) ? options : {});
 
-                if (!goog.isDef(options.cls)) {
-                  options.cls = 'active';
-                }
-                options.cls = /** @type {string} */ (options.cls);
+                /** @type {string} */
+                var className = goog.isDef(btnOptions.cls) ?
+                    btnOptions.cls : 'active';
 
                 var buttonsCtrl = ctrls[0];
                 var ngModelCtrl = ctrls[1];
@@ -84,7 +84,7 @@ goModule.directive('goBtnGroup', function() {
                   if (ngModelCtrl.$viewValue && goog.isDef(buttonsCtrl)) {
                     buttonsCtrl.activate(indexInGroup);
                   }
-                  element.toggleClass(options.cls, ngModelCtrl.$viewValue);
+                  element.toggleClass(className, ngModelCtrl.$viewValue);
                 };
               }
         };
