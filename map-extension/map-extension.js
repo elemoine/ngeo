@@ -22,7 +22,7 @@
              * @param {angular.Scope} scope Scope.
              * @param {angular.JQLite} element Element.
              * @param {angular.Attributes} attrs Attributes.
-             * @param {!Object} controller Controller.
+             * @param {ngeo.MapDirectiveController} controller Controller.
              */
             function(scope, element, attrs, controller) {
               var map = controller.getMap();
