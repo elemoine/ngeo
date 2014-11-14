@@ -38,11 +38,12 @@
       var view = map.getView();
 
       var zoom = ngeoLocation.getParam('z');
-      zoom = goog.isDef(zoom) ? +zoom : 4;
+      zoom = angular.isDefined(zoom) ? +zoom : 4;
 
       var x = ngeoLocation.getParam('x');
       var y = ngeoLocation.getParam('y');
-      var center = goog.isDef(x) && goog.isDef(y) ? [+x, +y] : [0, 0];
+      var center = angular.isDefined(x) && angular.isDefined(y) ?
+          [+x, +y] : [0, 0];
 
       view.setCenter(center);
       view.setZoom(zoom);
