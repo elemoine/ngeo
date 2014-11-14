@@ -48,6 +48,12 @@
       view.setCenter(center);
       view.setZoom(zoom);
 
+      ngeoLocation.updateParams({
+        'z': zoom,
+        'x': Math.round(center[0]),
+        'y': Math.round(center[1])
+      });
+
       view.on('propertychange',
           /**
            * @param {ol.ObjectEvent} e Object event.
