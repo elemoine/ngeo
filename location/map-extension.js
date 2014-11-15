@@ -62,8 +62,8 @@
             var center = view.getCenter();
             var params = {
               'z': view.getZoom(),
-              'x': Math.round(center[0], 2),
-              'y': Math.round(center[1], 2)
+              'x': Math.round(center[0]),
+              'y': Math.round(center[1])
             };
             $scope.$apply(function() {
               ngeoLocation.updateParams(params);
