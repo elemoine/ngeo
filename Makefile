@@ -1,7 +1,7 @@
 SRC_JS_FILES := $(shell find src -type f -name '*.js')
 EXPORTS_JS_FILES := $(shell find exports -type f -name '*.js')
-EXAMPLES_JS_FILES := $(shell find examples -type f -name '*.js')
-EXAMPLES_HTML_FILES := $(shell find examples -type f -name '*.html')
+EXAMPLES_JS_FILES := $(shell find examples -maxdepth 1 -type f -name '*.js')
+EXAMPLES_HTML_FILES := $(shell find examples -maxdepth 1 -type f -name '*.html')
 BUILD_EXAMPLES_CHECK_TIMESTAMP_FILES := $(patsubst examples/%.html, .build/%.check.timestamp, $(EXAMPLES_HTML_FILES))
 
 .PHONY: all
@@ -58,6 +58,8 @@ gh-pages: .build/ngeo-$(GITHUB_USERNAME)-gh-pages check-examples
 	 cp -r ../examples-hosted/*.html $(GIT_BRANCH) && \
 	 cp -r ../examples-hosted/*.js $(GIT_BRANCH) && \
 	 cp -r ../examples-hosted/*.css $(GIT_BRANCH) && \
+	 cp -r ../examples-hosted/data $(GIT_BRANCH) && \
+	 cp -r ../examples-hosted/partials $(GIT_BRANCH) && \
 	 git add -A . && \
 	 git commit -m 'Update GitHub pages' && \
 	 git push origin gh-pages)
@@ -118,6 +120,14 @@ dist/ngeo-whitespace.js: buildtools/ngeo-whitespace.json .build/externs/angular-
 	mkdir -p $(dir $@)
 	cp $< $@
 
+.build/examples-hosted/partials: examples/partials
+	mkdir -p $@
+	cp examples/partials/* $@
+
+.build/examples-hosted/data: examples/data
+	mkdir -p $@
+	cp examples/data/* $@
+
 node_modules/angular/angular.min.js: .build/node_modules.timestamp
 
 .PRECIOUS: .build/examples-hosted/%.html
@@ -134,7 +144,8 @@ node_modules/angular/angular.min.js: .build/node_modules.timestamp
 	sed -e '/^goog\.provide/d' -e '/^goog\.require/d' $< > $@
 
 .build/%.check.timestamp: .build/examples-hosted/%.html .build/examples-hosted/%.js .build/examples-hosted/ngeo.js \
-	                      .build/examples-hosted/ngeo.css .build/examples-hosted/angular.min.js .build/node_modules.timestamp
+	                      .build/examples-hosted/ngeo.css .build/examples-hosted/angular.min.js \
+						  .build/examples-hosted/partials .build/examples-hosted/data .build/node_modules.timestamp
 	mkdir -p $(dir $@)
 	./node_modules/phantomjs/bin/phantomjs buildtools/check-example.js $<
 	touch $@
@@ -199,6 +210,8 @@ clean:
 	rm -f .build/examples-hosted/*.js
 	rm -f .build/examples-hosted/*.html
 	rm -f .build/examples-hosted/ngeo.css
+	rm -rf .build/examples-hosted/data
+	rm -rf .build/examples-hosted/partials
 	rm -f .build/gjslint.timestamp
 	rm -f .build/jshint.timestamp
 	rm -f .build/ol-deps.js
