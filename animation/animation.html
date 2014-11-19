@@ -26,8 +26,7 @@
       Bigger!
     </label>
     <p>Use the <em>Bigger!</em> checkbox to change the size of the map.</p>
-    <p>This example show how to animate the resizing of a map without distortions of the map during the animation. This works by running a <code>requestAnimationFrame</code> loop to call <code>map.updateSize</code> during the CSS transition.</p>
-    <p>The technique used in this example requires manually using the <code>$animate</code> service to trigger the animation. This means we cannot rely on <code>ngClass</code> or other Angular directives for the initiation of the animation. This is unfortunate. See this <a href="http://stackoverflow.com/questions/27013674/notification-when-transition-completes">question</a> on StackOverflow.</p>
+    <p>This example show how to animate the resizing of a map without distortions of the map during the animation. This uses the <code>ngeoResizemap</code> directive.</p>
     <script src="angular.min.js"></script>
     <script src="angular-animate.min.js"></script>
     <script src="ngeo.js"></script>
