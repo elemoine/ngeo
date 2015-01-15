@@ -6,19 +6,14 @@ var app = {};
 
 
 /** @type {!angular.Module} **/
-app.module = angular.module('app', ['ngeo']);
+app.module = angular.module('app', ['ngeo', 'ui.bootstrap.dropdown']);
 
 
 /**
  * The application-specific background layer directive.
  *
- * The directive is based on Angular's select, ngOptions, ngModel, and
- * ngChange directives. ngChange is used to avoid adding a watcher on
- * the ngModel expression.
- *
- * Note: we don't need two-way binding for ngModel here, but using ::
- * for the ngModel expression doesn't actually make a difference. This
- * is because ngModel doesn't actually watch the ngModel expression.
+ * The directive is based on Angular UI Bootstrap's dropdown and dropdownToggle
+ * directives. It also uses Angular's ngRepeat and ngClick directives.
  *
  * @return {angular.Directive} Directive Defintion Object.
  */
@@ -28,7 +23,7 @@ app.backgroundlayerDirective = function() {
     scope: {
       'map': '=appBackgroundlayerMap'
     },
-    templateUrl: 'partials/backgroundlayer.html',
+    templateUrl: 'partials/backgroundlayerdropdown.html',
     controllerAs: 'ctrl',
     bindToController: true,
     controller: 'AppBackgroundlayerController'
@@ -51,9 +46,9 @@ app.module.directive('appBackgroundlayer', app.backgroundlayerDirective);
 app.BackgroundlayerController = function($http, ngeoBackgroundLayerMgr) {
   $http.get('data/backgroundlayers.json').then(
       angular.bind(this, function(resp) {
-        this['bgLayers'] = resp.data;
-        // use the first layer by default
-        this['bgLayer'] = this['bgLayers'][0];
+        var bgLayers = resp.data;
+        this['bgLayers'] = bgLayers;
+        this.setLayer(bgLayers[0]);
       }));
 
   /**
@@ -65,14 +60,14 @@ app.BackgroundlayerController = function($http, ngeoBackgroundLayerMgr) {
 
 
 /**
- * Function called when the user selects a new background layer through
- * the select element. The ngChange directive used in the partial calls
- * it.
+ * Function called when the user selects a new background layer in the
+ * dropdown. Called by the ng-click directive used in the partial.
+ * @param {Object} layerSpec Layer specification object.
  * @export
  */
-app.BackgroundlayerController.prototype.change = function() {
-  var layerSpec = this['bgLayer'];
-  var layer = this.getLayer_(layerSpec['name']);
+app.BackgroundlayerController.prototype.setLayer = function(layerSpec) {
+  this['currentBgLayer'] = layerSpec;
+  var layer = this.createLayer_(layerSpec['name']);
   this.backgroundLayerMgr_.set(this['map'], layer);
 };
 
@@ -82,7 +77,7 @@ app.BackgroundlayerController.prototype.change = function() {
  * @return {ol.layer.Tile} The layer.
  * @private
  */
-app.BackgroundlayerController.prototype.getLayer_ = function(layerName) {
+app.BackgroundlayerController.prototype.createLayer_ = function(layerName) {
   var source;
   if (layerName === 'osm') {
     source = new ol.source.OSM();
