@@ -45,7 +45,7 @@ test: .build/ol-deps.js .build/ngeo-deps.js .build/node_modules.timestamp
 	./node_modules/karma/bin/karma start karma-conf.js --single-run
 
 .PHONY: serve
-serve:
+serve: .build/node_modules.timestamp node_modules/angular-ui-bootstrap/dist/ui-bootstrap-custom-tpls-0.12.0.min.js
 	node buildtools/serve.js
 
 .PHONY: gh-pages
@@ -132,6 +132,10 @@ dist/ngeo.css: node_modules/openlayers/css/ol.css .build/node_modules.timestamp
 	mkdir -p $(dir $@)
 	cp $< $@
 
+.build/examples-hosted/ui-bootstrap-custom-tpls-0.12.0.min.js: node_modules/angular-ui-bootstrap/dist/ui-bootstrap-custom-tpls-0.12.0.min.js
+	mkdir -p $(dir $@)
+	cp $< $@
+
 .build/examples-hosted/partials: examples/partials
 	mkdir -p $@
 	cp examples/partials/* $@
@@ -142,13 +146,17 @@ dist/ngeo.css: node_modules/openlayers/css/ol.css .build/node_modules.timestamp
 
 node_modules/angular/angular.min.js node_modules/angular-animate/angular-animate.min.js: .build/node_modules.timestamp
 
+node_modules/angular-ui-bootstrap/dist/ui-bootstrap-custom-tpls-0.12.0.min.js: .build/node_modules.timestamp
+	cd node_modules/angular-ui-bootstrap/ && npm install && ../grunt-cli/bin/grunt html2js && ../grunt-cli/bin/grunt build:dropdown
+
 .PRECIOUS: .build/examples-hosted/%.html
 .build/examples-hosted/%.html: examples/%.html
 	mkdir -p $(dir $@)
 	sed -e 's|\.\./node_modules/openlayers/css/ol.css|ngeo.css|' \
-		-e 's|\.\./node_modules/angular/angular.js|angular.min.js|' \
-		-e 's|\.\./node_modules/angular-animate/angular-animate.js|angular-animate.min.js|' \
-		-e 's/\/@?main=$*.js/$*.js/' \
+	    -e 's|\.\./node_modules/angular/angular.js|angular.min.js|' \
+	    -e 's|\.\./node_modules/angular-animate/angular-animate.js|angular-animate.min.js|' \
+	    -e 's|\.\./node_modules/angular-ui-bootstrap/dist/ui-bootstrap-custom-tpls-0.12.0.min.js|ui-bootstrap-custom-tpls-0.12.0.min.js|' \
+	    -e 's/\/@?main=$*.js/$*.js/' \
 	    -e '/$*.js/i\    <script src="ngeo.js"></script>' $< > $@
 
 .PRECIOUS: .build/examples-hosted/%.js
@@ -158,13 +166,14 @@ node_modules/angular/angular.min.js node_modules/angular-animate/angular-animate
 
 .build/%.check.timestamp: .build/examples-hosted/%.html \
                           .build/examples-hosted/%.js \
-	                      .build/examples-hosted/ngeo.js \
-	                      .build/examples-hosted/ngeo.css \
-						  .build/examples-hosted/angular.min.js \
-						  .build/examples-hosted/angular-animate.min.js \
-						  .build/examples-hosted/data \
-						  .build/examples-hosted/partials \
-						  .build/node_modules.timestamp
+	                  .build/examples-hosted/ngeo.js \
+	                  .build/examples-hosted/ngeo.css \
+			  .build/examples-hosted/angular.min.js \
+			  .build/examples-hosted/angular-animate.min.js \
+			  .build/examples-hosted/ui-bootstrap-custom-tpls-0.12.0.min.js \
+			  .build/examples-hosted/data \
+			  .build/examples-hosted/partials \
+			  .build/node_modules.timestamp
 	mkdir -p $(dir $@)
 	./node_modules/phantomjs/bin/phantomjs buildtools/check-example.js $<
 	touch $@
