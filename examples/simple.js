@@ -15,6 +15,20 @@ var app = {};
 app.module = angular.module('app', ['ngeo']);
 
 
+/**
+ * @return {angular.Directive} The directive specs.
+ * @ngInject
+ */
+app.testDirective = function() {
+  return {
+    restrict: 'E',
+    templateUrl: 'partials/test.html'
+  };
+};
+
+app.module.directive('appTest', app.testDirective);
+
+
 
 /**
  * @constructor
