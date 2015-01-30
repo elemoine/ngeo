@@ -1,7 +1,7 @@
 <!DOCTYPE>
 <html ng-app='app'>
   <head>
-    <title>Scale selection example</title>
+    <title>Scale selector example</title>
     <meta charset="utf-8">
     <meta name="viewport"
           content="initial-scale=1.0, user-scalable=no, width=device-width">
@@ -12,11 +12,11 @@
       #map {
         height: 400px;
       }
-      .dropdown button {
-        min-width: 132px;
-      }
       app-scaleselector {
         display: inline-block;
+      }
+      app-scaleselector .dropdown button {
+        min-width: 132px;
       }
     </style>
   </head>
@@ -27,13 +27,13 @@
       <app-scaleselector app-scaleselector-map="::mainCtrl.map"></app-scaleselector>
     </label>
     <div>
-      This example shows how to write an application-specific directive (<code>app-scaleselecor</code>) to create a scale selector. The directive is based on Bootstrap's <code>dropdown</code> jQuery plugin.
+      This example shows how to write an application-specific directive (<code>app-scaleselecor</code>) based on <code>ngeo-scaleselector</code>to create a scale selector.
     </div>
     <script src="jquery.min.js"></script>
     <script src="angular.min.js"></script>
     <script src="bootstrap.min.js"></script>
     <script src="ngeo.js"></script>
-    <script src="scaledropdown.js"></script>
+    <script src="scaleselector.js"></script>
     <script src="../utils/watchwatchers.js"></script>
   </body>
 </html>

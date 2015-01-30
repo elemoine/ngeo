@@ -15,7 +15,8 @@ app.module.value('ngeoScaleselectorTemplateUrl',
 
 
 /**
- * The application-specific scale selector directive.
+ * The application-specific scale selector directive, based on the
+ * ngeo-scaleselector directive.
  *
  * @return {angular.Directive} Directive Definition Object.
  */
@@ -47,6 +48,7 @@ app.ScaleselectorController = function($sce) {
 
   /**
    * The zoom level/scale map object for the ngeoScaleselector directive.
+   * The values need to be trusted as HTML.
    * @type {Object.<string, string>}
    * @const
    */
