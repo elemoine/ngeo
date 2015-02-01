@@ -13,10 +13,18 @@ app.module = angular.module('app', ['ngeo']);
 /**
  * @param {angular.Scope} $scope Scope.
  * @param {ngeo.DecorateLayer} ngeoDecorateLayer Decorate layer service.
+ * @param {ngeo.SyncArrays} ngeoSyncArrays Array sync service.
  * @constructor
+ * @export
  * @ngInject
  */
-app.MainController = function($scope, ngeoDecorateLayer) {
+app.MainController = function($scope, ngeoDecorateLayer, ngeoSyncArrays) {
+
+  /** @type {ol.layer.Tile} */
+  var mapquest = new ol.layer.Tile({
+    source: new ol.source.MapQuest({layer: 'sat'})
+  });
+  mapquest.set('name', 'MapQuest');
 
   /** @type {ol.layer.Tile} */
   var boundaries = new ol.layer.Tile({
@@ -24,19 +32,9 @@ app.MainController = function($scope, ngeoDecorateLayer) {
       url: 'http://demo.opengeo.org/geoserver/wms',
       params: {'LAYERS': 'topp:tasmania_state_boundaries'},
       serverType: 'geoserver'
-    }),
-    name: 'Boundaries'
+    })
   });
-
-  /** @type {ol.layer.Tile} */
-  var roads = new ol.layer.Tile({
-    source: new ol.source.TileWMS({
-      url: 'http://demo.opengeo.org/geoserver/wms',
-      params: {'LAYERS': 'topp:tasmania_roads'},
-      serverType: 'geoserver'
-    }),
-    name: 'Roads'
-  });
+  boundaries.set('name', 'Boundaries');
 
   /** @type {ol.layer.Tile} */
   var waterBodies = new ol.layer.Tile({
@@ -44,9 +42,9 @@ app.MainController = function($scope, ngeoDecorateLayer) {
       url: 'http://demo.opengeo.org/geoserver/wms',
       params: {'LAYERS': 'topp:tasmania_water_bodies'},
       serverType: 'geoserver'
-    }),
-    name: 'Water bodies'
+    })
   });
+  waterBodies.set('name', 'Water bodies');
 
   /** @type {ol.layer.Tile} */
   var cities = new ol.layer.Tile({
@@ -54,20 +52,16 @@ app.MainController = function($scope, ngeoDecorateLayer) {
       url: 'http://demo.opengeo.org/geoserver/wms',
       params: {'LAYERS': 'topp:tasmania_cities'},
       serverType: 'geoserver'
-    }),
-    name: 'Cities'
+    })
   });
+  cities.set('name', 'Cities');
 
 
   /** @type {ol.Map} */
   this['map'] = new ol.Map({
     layers: [
-      new ol.layer.Tile({
-        source: new ol.source.MapQuest({layer: 'sat'}),
-        name: 'MapQuest'
-      }),
+      mapquest,
       boundaries,
-      roads,
       waterBodies,
       cities
     ],
@@ -77,11 +71,70 @@ app.MainController = function($scope, ngeoDecorateLayer) {
     })
   });
 
+  var map = this['map'];
+
+  /**
+   * @type {ol.Map}
+   * @private
+   */
+  this.map_ = map;
+
+  /**
+   * @type {ol.layer.Tile}
+   * @private
+   */
+  this.roads_ = new ol.layer.Tile({
+    source: new ol.source.TileWMS({
+      url: 'http://demo.opengeo.org/geoserver/wms',
+      params: {'LAYERS': 'topp:tasmania_roads'},
+      serverType: 'geoserver'
+    })
+  });
+  this.roads_.set('name', 'Roads');
+
+  /**
+   * @param {ol.layer.Base} layer Layer.
+   * @return {boolean} `false` if the layer shouldn't be part of the selected
+   *     layers.
+   */
+  function layerFilter(layer) {
+    return layer !== mapquest;
+  }
+
+  /** @type {Array.<ol.layer.Layer>} */
+  var mapLayers = map.getLayers().getArray();
+  this['selectedLayers'] = [];
+  var selectedLayers = this['selectedLayers'];
+  ngeoSyncArrays(mapLayers, selectedLayers, true, $scope, layerFilter);
+
   // watch any change on layers array to refresh the map
-  $scope.layers = this['map'].getLayers().getArray();
-  $scope.$watchCollection('layers', goog.bind(function() {
-    this['map'].render();
-  }, this));
+  $scope.$watchCollection(function() {
+    return selectedLayers;
+  }, function() {
+    map.render();
+  });
+};
+
+
+/**
+ * Add/remove the "Roads" layer when used as a setter, and return whether
+ * the "Roads" layer is in the map when used as a getter.
+ * @param {boolean|undefined} val Value.
+ * @return {boolean|undefined} `true` if the "Roads" layer is in the map,
+ *     `false` if the "Roads" layer is not in the map, `undefined` if the
+ *     function is used as setter.
+ * @export
+ */
+app.MainController.prototype.toggleRoadsLayer = function(val) {
+  if (!angular.isDefined(val)) {
+    return this.map_.getLayers().getArray().indexOf(this.roads_) >= 0;
+  } else {
+    if (val) {
+      this.map_.addLayer(this.roads_);
+    } else {
+      this.map_.removeLayer(this.roads_);
+    }
+  }
 };
 
 
