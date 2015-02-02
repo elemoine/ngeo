@@ -22,7 +22,7 @@
           border: 1px solid;
           padding: 5px;
         }
-        .handle {
+        .sortable-handle {
           border: 1px solid red;
           display: inline-block;
           width: 10px;
@@ -42,9 +42,9 @@
       <br>
       Hint: drag-drop elements using the red handle.
     </p>
-    <ul ngeo-sortable="ctrl.selectedLayers">
+    <ul ngeo-sortable="ctrl.selectedLayers" ngeo-sortable-options="{handleClassName: 'sortable-handle'}">
       <li ng-repeat="layer in ctrl.selectedLayers">
-        <span class="handle"></span>{{layer.get('name')}}
+        <span class="sortable-handle"></span>{{layer.get('name')}}
       </li>
     </ul>
     <label>
