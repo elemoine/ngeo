@@ -1,4 +1,5 @@
 goog.require('ngeo.Location');
+goog.require('ngeo.LocationProvider');
 
 goog.exportProperty(
     ngeo.Location.prototype,
@@ -20,3 +21,8 @@ goog.exportProperty(
     ngeo.Location.prototype,
     'refresh',
     ngeo.Location.prototype.refresh);
+
+goog.exportProperty(
+    ngeo.LocationProvider.prototype,
+    'foolLocation',
+    ngeo.LocationProvider.prototype.foolLocation);
