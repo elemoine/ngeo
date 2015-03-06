@@ -1,5 +1,14 @@
+language: ruby
+branches:
+  only:
+  - master
 before_install:
-  - "sudo apt-get install python-virtualenv"
-  - "npm install -g npm && npm install"
-
-script: "make check"
+- sudo apt-get install python-virtualenv
+- npm install -g npm && npm install
+script:
+- make check
+after_success:
+- '[ "${TRAVIS_PULL_REQUEST}" = "false" ] && make gh-pages-from-travis || /bin/true'
+env:
+  global:
+  - secure: "iK+xKyWJ2ZpO7BVvgITgE41lJXsw0NfmDz2+pSwGL3TztR+QsuL42LroiYG9PNjFjpaxhEsuq/SLNcbS+X8sVUeRXVP4KyBm0RnTpOqyaSntSlrzl604flj7bYHktvh3aXAszNwFpHMVaH1t6NErfQAfavXDvDu7YfiTBG7fH18="
