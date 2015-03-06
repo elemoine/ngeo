@@ -12,12 +12,15 @@
         width: 600px;
         height: 400px;
       }
+      #mouse-position {
+      }
     </style>
   </head>
   <body ng-controller="MainController as ctrl">
     <div id="map" ngeo-map="ctrl.map"></div>
+    Mouse position: <div id="mouse-position" ngeo-control="ctrl.control" ngeo-control-map="ctrl.map"></div>
     <script src="angular.min.js"></script>
     <script src="ngeo.js"></script>
-    <script src="simple.js"></script>
+    <script src="control.js"></script>
   </body>
 </html>
