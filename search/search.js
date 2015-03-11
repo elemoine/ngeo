@@ -14,8 +14,29 @@ app.module = angular.module('app', ['ngeo']);
  */
 app.searchDirective = function() {
   return {
-    restrict: 'A',
-    controller: 'AppSearchController'
+    restrict: 'E',
+    scope: {
+      'map': '=appSearchMap'
+    },
+    controller: 'AppSearchController',
+    bindToController: true,
+    controllerAs: 'ctrl',
+    template:
+        '<input type="text" placeholder="search…" ' +
+        'ngeo-search="ctrl.options" ' +
+        'ngeo-search-datasets="ctrl.datasets" ' +
+        'ngeo-search-listeners="ctrl.listeners">',
+    link:
+        /**
+         * @param {angular.Scope} scope Scope.
+         * @param {angular.JQLite} element Element.
+         * @param {angular.Attributes} attrs Atttributes.
+         */
+        function(scope, element, attrs) {
+          element.find('input').on('focus', function() {
+            $(this).val('');
+          });
+        }
   };
 };
 
@@ -26,62 +47,90 @@ app.module.directive('appSearch', app.searchDirective);
 
 /**
  * @constructor
- * @param {angular.Scope} $scope Angular scope.
- * @param {angular.JQLite} $element jQuery element.
- * @param {angular.Attributes} $attrs Element attributes.
+ * @param {ngeo.CreateGeoJSONBloodhound} ngeoCreateGeoJSONBloodhound The ngeo
+ *     create GeoJSON Bloodhound service.
  * @ngInject
  */
-app.SearchController = function($scope, $element, $attrs) {
+app.SearchController = function(ngeoCreateGeoJSONBloodhound) {
 
-  var map = /** @type {ol.Map} */ ($scope.$eval($attrs['appSearchMap']));
-  // goog.asserts.assertInstanceof(map, ol.Map);
+  /**
+   * @type {ol.FeatureOverlay}
+   * @private
+   */
+  this.featureOverlay_ = this.createFeatureOverlay_();
 
-  var featureOverlay = new ol.FeatureOverlay();
-  featureOverlay.setMap(map);
+  /** @type {Bloodhound} */
+  var bloodhoundEngine = this.createAndInitBloodhound_(
+      ngeoCreateGeoJSONBloodhound);
 
-  var geojsonFormat = new ol.format.GeoJSON();
+  /** @type {TypeaheadOptions} */
+  this['options'] = null;
 
-  var engine = new Bloodhound(/** @type {BloodhoundOptions} */ ({
-    remote: {
-      url: 'http://devv3.geoportail.lu/main/wsgi/fulltextsearch?query=%QUERY',
-      ajax: {
-        dataType: 'jsonp'
-      },
-      filter: function(parsedResponse) {
-        var featureCollection = /** @type {GeoJSONFeatureCollection} */
-            (parsedResponse);
-        return geojsonFormat.readFeatures(featureCollection,
-            {featureProjection: 'EPSG:3857'});
-      }
-    },
-    // datumTokenizer is required by the Bloodhound constructor but it
-    // is not used when only a remote is passsed to Bloodhound.
-    datumTokenizer: function(datum) {},
-    queryTokenizer: Bloodhound.tokenizers.whitespace
-  }));
-
-  engine.initialize();
-
-  $element.typeahead(null, {
-    source: engine.ttAdapter(),
+  /** @type {Array.<TypeaheadDataset>} */
+  this['datasets'] = [{
+    source: bloodhoundEngine.ttAdapter(),
     displayKey: function(suggestion) {
       var feature = /** @type {ol.Feature} */ (suggestion);
       return feature.get('label');
+    },
+    templates: {
+      header: function() {
+        return '<div class="header">Addresses</div>';
+      }
     }
+  }];
+
+  this['listeners'] = /** @type {ngeox.SearchDirectiveListeners} */ ({
+    selected: angular.bind(this, app.SearchController.selected_)
   });
 
-  $element.on('typeahead:selected', function(element, suggestion, dataset) {
-    var feature = /** @type {ol.Feature} */ (suggestion);
-    var features = featureOverlay.getFeatures();
-    var featureGeometry = /** @type {ol.geom.SimpleGeometry} */
-        (feature.getGeometry());
-    var mapSize = /** @type {ol.Size} */ (map.getSize());
-    features.clear();
-    features.push(feature);
-    map.getView().fitGeometry(featureGeometry, mapSize,
-        /** @type {olx.view.FitGeometryOptions} */ ({maxZoom: 16}));
-  });
+};
 
+
+/**
+ * @return {ol.FeatureOverlay} The feature overlay.
+ * @private
+ */
+app.SearchController.prototype.createFeatureOverlay_ = function() {
+  var featureOverlay = new ol.FeatureOverlay();
+  featureOverlay.setMap(this['map']);
+  return featureOverlay;
+};
+
+
+/**
+ * @param {ngeo.CreateGeoJSONBloodhound} ngeoCreateGeoJSONBloodhound The ngeo
+ *     create GeoJSON Bloodhound service.
+ * @return {Bloodhound} The bloodhound engine.
+ * @private
+ */
+app.SearchController.prototype.createAndInitBloodhound_ =
+    function(ngeoCreateGeoJSONBloodhound) {
+  var url = 'http://devv3.geoportail.lu/main/wsgi/fulltextsearch?query=%QUERY';
+  var bloodhound = ngeoCreateGeoJSONBloodhound(url, ol.proj.get('EPSG:3857'));
+  bloodhound.initialize();
+  return bloodhound;
+};
+
+
+/**
+ * @param {jQuery.event} event Event.
+ * @param {Object} suggestion Suggestion.
+ * @param {TypeaheadDataset} dataset Dataset.
+ * @this {app.SearchController}
+ * @private
+ */
+app.SearchController.selected_ = function(event, suggestion, dataset) {
+  var map = /** @type {ol.Map} */ (this['map']);
+  var feature = /** @type {ol.Feature} */ (suggestion);
+  var features = this.featureOverlay_.getFeatures();
+  var featureGeometry = /** @type {ol.geom.SimpleGeometry} */
+      (feature.getGeometry());
+  var mapSize = /** @type {ol.Size} */ (map.getSize());
+  features.clear();
+  features.push(feature);
+  map.getView().fitGeometry(featureGeometry, mapSize,
+      /** @type {olx.view.FitGeometryOptions} */ ({maxZoom: 16}));
 };
 
 
