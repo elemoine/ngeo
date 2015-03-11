@@ -33,7 +33,8 @@ app.searchDirective = function() {
          * @param {angular.Attributes} attrs Atttributes.
          */
         function(scope, element, attrs) {
-          element.find('input').on('focus', function() {
+          // Empty the search field on focus and blur.
+          element.find('input').on('focus blur', function() {
             $(this).val('');
           });
         }
@@ -47,11 +48,14 @@ app.module.directive('appSearch', app.searchDirective);
 
 /**
  * @constructor
+ * @param {angular.Scope} $rootScope Angular root scope.
+ * @param {angular.$compile} $compile Angular compile service.
  * @param {ngeo.CreateGeoJSONBloodhound} ngeoCreateGeoJSONBloodhound The ngeo
  *     create GeoJSON Bloodhound service.
  * @ngInject
  */
-app.SearchController = function(ngeoCreateGeoJSONBloodhound) {
+app.SearchController = function($rootScope, $compile,
+    ngeoCreateGeoJSONBloodhound) {
 
   /**
    * @type {ol.FeatureOverlay}
@@ -64,7 +68,9 @@ app.SearchController = function(ngeoCreateGeoJSONBloodhound) {
       ngeoCreateGeoJSONBloodhound);
 
   /** @type {TypeaheadOptions} */
-  this['options'] = null;
+  this['options'] = {
+    highlight: true
+  };
 
   /** @type {Array.<TypeaheadDataset>} */
   this['datasets'] = [{
@@ -76,6 +82,21 @@ app.SearchController = function(ngeoCreateGeoJSONBloodhound) {
     templates: {
       header: function() {
         return '<div class="header">Addresses</div>';
+      },
+      suggestion: function(suggestion) {
+        var feature = /** @type {ol.Feature} */ (suggestion);
+
+        // A scope for the ng-click on the suggestion's « i » button.
+        var scope = $rootScope.$new(true);
+        scope['feature'] = feature;
+        scope['click'] = function(event) {
+          window.alert(feature.get('label'));
+          event.stopPropagation();
+        };
+
+        var html = '<p>' + feature.get('label') +
+            '<button ng-click="click($event)">i</button></p>';
+        return $compile(html)(scope);
       }
     }
   }];
