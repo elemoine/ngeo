@@ -70,15 +70,51 @@ nav.nav-right {
     line-height: @nav-bar-height;
     background-color: @nav-header-bg;
 
+    .go-back {
+      position: absolute;
+      left: 0;
+      z-index: 2;
+      transition: opacity @duration;
+      will-change: opacity;
+      opacity: 0;
+      display: none;
+
+      &.active {
+        opacity: 1;
+        display: block;
+      }
+    }
+
     > nav {
       position: absolute;
-      transform: translateX(100%);
+      width: @nav-width;
+      left: @nav-width;
+      transform: translateX(0);
       transition: transform @duration, opacity @duration;
       will-change: transform, opacity;
       opacity: 0;
+      text-align: center;
+
+
       &.active {
-        transform: translateX(0);
+        transform: translateX(-100%);
         opacity: 1;
+      }
+      &.slide-out {
+        transform: translateX(-120%);
+        opacity: 0;
+      }
+    }
+
+    &.back {
+      > nav {
+        transform: translate(-120%);
+      }
+      > nav.active {
+        transform: translateX(-100%);
+      }
+      > nav.slide-out {
+        transform: translateX(0);
       }
     }
   }

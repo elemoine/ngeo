@@ -78,6 +78,8 @@ app.navDirective = function() {
 
           var header = element.find('> header');
 
+          var backButton = element.find('header > .go-back');
+
           /**
            * @param {boolean} back Whether to move back.
            */
@@ -89,24 +91,21 @@ app.navDirective = function() {
             header.find('nav:not(.active)').remove();
 
             // deactivate the currently active nav
-            header.find('nav.active').removeClass('active');
+            header.find('nav.active').removeClass('active')
+                .addClass('slide-out');
+
+            // show the back button when relevant
+            backButton.toggleClass('active', slid.length > 0);
 
             // create a new nav
             nav = $('<nav>');
-
-            if (slid.length) {
-              var backButton = $('<a>', {
-                text: '< back',
-                'class': 'go-back',
-                href: '#'
-              }).click(goBack);
-              nav.append(backButton);
-            }
             nav.append($('<span>', {
               text: active.attr('data-header-title')
             }));
             header.append(nav);
-            nav.addClass('active');
+            window.setTimeout(function() {
+                nav.addClass('active');
+            }, 0);
           }
 
           // watch for clicks on items with children
@@ -141,6 +140,8 @@ app.navDirective = function() {
             active = slideBack;
             updateNavigationHeader(true);
           }
+
+          backButton.click(goBack);
         }
   };
 };
