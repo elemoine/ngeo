@@ -74,16 +74,24 @@ nav.nav-right {
       position: absolute;
       left: 0;
       z-index: 2;
-      transition: opacity @duration;
-      will-change: opacity;
+      transition: opacity 1s;
+      will-change: opacity, visibility;
       opacity: 0;
-      display: none;
+      visibility: hidden;
+      height: @nav-bar-height;
+      width: 30px;
 
       &.active {
         opacity: 1;
-        display: block;
+        visibility: visible;
+      }
+
+      &::before, &::after {
+        transform-origin: 1px 50%;
+        left: 10px;
       }
     }
+
 
     > nav {
       position: absolute;
@@ -116,6 +124,40 @@ nav.nav-right {
       > nav.slide-out {
         transform: translateX(0);
       }
+    }
+  }
+
+  a[data-toggle] {
+    position: relative;
+    padding-right: 40px;
+
+    &::before, &::after {
+      /* arrow goes on the right side - children navigation */
+      right: 20px;
+      transform-origin: 9px 50%;
+    }
+  }
+
+  .go-back,
+  a[data-toggle] {
+    &::before, &::after {
+      /* arrow icon in CSS - for element with nested unordered lists */
+      content: '';
+      position: absolute;
+      top: 50%;
+      margin-top: -1px;
+      display: inline-block;
+      height: 2px;
+      width: 10px;
+      background: darken(@nav-bg, 20%);
+      .backface-visibility(hidden);
+    }
+
+    &::before {
+      transform: rotate(45deg);
+    }
+    &::after {
+      transform: rotate(-45deg);
     }
   }
 
