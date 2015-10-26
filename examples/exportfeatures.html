@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html ng-app='app'>
+  <head>
+    <title>Export features example</title>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="stylesheet" href="../node_modules/openlayers/css/ol.css" type="text/css">
+    <style>
+      #map {
+        width: 600px;
+        height: 400px;
+      }
+    </style>
+  </head>
+  <body ng-controller="MainController as ctrl">
+    <div id="map" ngeo-map="ctrl.map"></div>
+    <button id="save" ng-click="ctrl.exportAsKml()">Export as KML</button>
+    <input id="export" type="file" app-fileread="ctrl.fileread" />
+    <p id="desc">This example shows how to use the <code>ngeo-map</code> directive to insert an OpenLayers map in a page.</p>
+    <script src="../node_modules/angular/angular.js"></script>
+    <script src="../node_modules/filesaver.js/FileSaver.js"></script>
+    <script src="/@?main=exportfeatures.js"></script>
+    <script src="../utils/watchwatchers.js"></script>
+  </body>
+</html>

@@ -24,6 +24,7 @@
       ".build/externs/jquery-1.9.js",
       "externs/angular-gettext.js",
       "externs/d3.js",
+      "externs/filesaver.js",
       "externs/typeahead.js",
       "externs/mapfish-print-v3.js",
       "externs/twbootstrap.js"
@@ -60,7 +61,6 @@
       "misplacedTypeAnnotation",
       "missingGetCssName",
       "missingProperties",
-      "missingProvide",
       "missingReturn",
       "newCheckTypes",
       "nonStandardJsDocs",
@@ -74,6 +74,7 @@
     ],
     "jscomp_off": [
       "missingRequire",
+      "missingProvide",
       "unknownDefines"
     ],
     "extra_annotation_name": [

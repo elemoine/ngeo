@@ -21,6 +21,7 @@
     "bootstrap": "^3.3.0",
     "clean-css": "^2.2.7",
     "d3": "^3.5.5",
+    "filesaver.js": "0.2.0",
     "fs-extra": "~0.8.1",
     "graceful-fs": "~3.0.2",
     "jquery": "2.1.4",

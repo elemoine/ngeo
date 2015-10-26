@@ -27,6 +27,7 @@
       "externs/angular-gettext.js",
       "externs/ngeox.js",
       "externs/d3.js",
+      "externs/filesaver.js",
       "externs/typeahead.js",
       "externs/mapfish-print-v3.js",
       "externs/twbootstrap.js"

@@ -211,6 +211,10 @@ $(GMF_EXAMPLES_CSS_FILES): %.css: $(GMF_EXAMPLES_LESS_FILES) .build/node_modules
 	mkdir -p $(dir $@)
 	cp $< $@
 
+.build/examples-hosted/lib/FileSaver.min.js: node_modules/filesaver.js/FileSaver.min.js
+	mkdir -p $(dir $@)
+	cp $< $@
+
 .build/examples-hosted/lib/watchwatchers.js: utils/watchwatchers.js
 	mkdir -p $(dir $@)
 	cp $< $@
@@ -242,6 +246,7 @@ node_modules/angular/angular.min.js: .build/node_modules.timestamp
 		-e 's|\.\./node_modules/bootstrap/dist/js/bootstrap.js|lib/bootstrap.min.js|' \
 		-e 's|\.\./node_modules/angular/angular.js|lib/angular.min.js|' \
 		-e 's|\.\./node_modules/d3/d3.js|lib/d3.min.js|' \
+		-e 's|\.\./node_modules/filesaver.js/FileSaver.js|lib/FileSaver.min.js|' \
 		-e 's|\.\./node_modules/typeahead.js/dist/typeahead.bundle.js|lib/typeahead.bundle.min.js|' \
 		-e 's|/@?main=$*.js|$*.js|' \
 		-e 's|\.\./utils/watchwatchers.js|lib/watchwatchers.js|' \
@@ -256,6 +261,7 @@ node_modules/angular/angular.min.js: .build/node_modules.timestamp
 		-e 's|\.\./node_modules/bootstrap/dist/js/bootstrap.js|lib/bootstrap.min.js|' \
 		-e 's|\.\./node_modules/angular/angular.js|lib/angular.min.js|' \
 		-e 's|\.\./node_modules/d3/d3.js|lib/d3.min.js|' \
+		-e 's|\.\./node_modules/filesaver.js/FileSaver.js|lib/FileSaver.min.js|' \
 		-e 's|\.\./node_modules/typeahead.js/dist/typeahead.bundle.js|lib/typeahead.bundle.min.js|' \
 		-e 's|/@?main=$*.js|$*.js|' \
 		-e 's|\.\./utils/watchwatchers.js|lib/watchwatchers.js|' \
@@ -290,6 +296,7 @@ node_modules/angular/angular.min.js: .build/node_modules.timestamp
 		.build/examples-hosted/lib/bootstrap.min.css \
 		.build/examples-hosted/lib/jquery.min.js \
 		.build/examples-hosted/lib/d3.min.js \
+		.build/examples-hosted/lib/FileSaver.min.js \
 		.build/examples-hosted/lib/watchwatchers.js \
 		.build/examples-hosted/lib/typeahead.bundle.min.js \
 		.build/examples-hosted/data \
