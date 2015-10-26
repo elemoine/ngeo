@@ -1,4 +1,3 @@
-@duration: .3s;
 main {
   position: relative;
   background-color: @color3;
@@ -8,7 +7,7 @@ main {
   text-align: center;
 
   transform: translateZ(0);
-  transition: transform @duration;
+  transition: transform .3s;
   will-change: transform;
   .nav-left-is-visible & {
     transform: translateX(@nav-width);
@@ -30,7 +29,7 @@ main {
     visibility: hidden;
     opacity: 0;
 
-    .transition(opacity @duration, visibility @duration;);
+    .transition(opacity .3s, visibility .3s;);
     .backface-visibility(hidden);
 
     .nav-is-visible & {
@@ -53,8 +52,7 @@ main {
 
 @nav-bar-height: 50px;
 
-nav.nav-left,
-nav.nav-right {
+nav, nav ul {
   position: fixed;
   top: 0;
   width: @nav-width;
@@ -64,79 +62,43 @@ nav.nav-right {
   -webkit-overflow-scrolling: touch;
   z-index: @below-content-index;
 
+  transform: translateZ(0);
+  transition: transform .3s;
+}
+
+nav > ul {
+  margin-top: @nav-bar-height;
+}
+
+nav.nav-left,
+nav.nav-left  > ul {
+  .nav-left-is-visible & {
+    visibility: visible;
+    .transition(visibility 0s);
+  }
+}
+nav.nav-right,
+nav.nav-right  > ul {
+  .nav-right-is-visible & {
+    visibility: visible;
+    .transition(visibility 0s);
+  }
+}
+
+nav {
+  &,
+  > ul {
+    /* by default .cd-primary-nav is hidden - trick for iOS devices where you can see the navigation if you pull down */
+    visibility: hidden;
+    .transition(visibility 0s .3s);
+  }
+
   header {
     display: block;
     height: @nav-bar-height;
     line-height: @nav-bar-height;
     background-color: @nav-header-bg;
-
-    .go-back {
-      position: absolute;
-      left: 0;
-      z-index: 2;
-      transition: opacity 1s;
-      will-change: opacity, visibility;
-      opacity: 0;
-      visibility: hidden;
-
-      &.active {
-        opacity: 1;
-        visibility: visible;
-      }
-
-      &::before, &::after {
-        /* arrow icon in CSS - for element with nested unordered lists */
-        content: '';
-        position: absolute;
-        top: 50%;
-        margin-top: -1px;
-        display: inline-block;
-        height: 2px;
-        width: 10px;
-        background: darken(@nav-bg, 20%);
-        .backface-visibility(hidden);
-      }
-
-      &::before {
-        transform: rotate(45deg);
-      }
-      &::after {
-        transform: rotate(-45deg);
-      }
-    }
-
-    > nav {
-      position: absolute;
-      width: @nav-width;
-      left: @nav-width;
-      transform: translateX(0);
-      transition: transform @duration, opacity @duration;
-      will-change: transform, opacity;
-      opacity: 0;
-      text-align: center;
-
-
-      &.active {
-        transform: translateX(-100%);
-        opacity: 1;
-      }
-      &.slide-out {
-        transform: translateX(-120%);
-        opacity: 0;
-      }
-    }
-
-    &.back {
-      > nav {
-        transform: translate(-120%);
-      }
-      > nav.active {
-        transform: translateX(-100%);
-      }
-      > nav.slide-out {
-        transform: translateX(0);
-      }
-    }
+    text-align: center;
   }
 
   @menu-item-height: @nav-bar-height;
@@ -151,22 +113,64 @@ nav.nav-right {
     white-space: nowrap;
   }
 
-  .slide {
-    position: fixed;
-    height: 100%;
-    width: @nav-width;
-    transform: translateX(100%);
-    transition: transform @duration, opacity @duration;
+  a {
+    transform: translateZ(0);
     will-change: transform, opacity;
-    opacity: 0;
+    transition: transform .3s, opacity .3s;
+  }
 
-    &.active {
-      transform: translateX(0%);
-      opacity: 1;
-    }
-    &.slide-out {
+  .is-hidden {
+    transform: translateX(100%);
+  }
+  .moves-out {
+    & > li > a {
       transform: translateX(-20%);
       opacity: 0;
+    }
+  }
+
+  .has-children > a,
+  .go-back {
+    position: relative;
+
+    &::before, &::after {
+      /* arrow icon in CSS - for element with nested unordered lists */
+      content: '';
+      position: absolute;
+      top: 50%;
+      margin-top: -1px;
+      display: inline-block;
+      height: 2px;
+      width: 10px;
+      background: darken(@nav-bg, 20%);
+      .backface-visibility(hidden);
+    }
+
+    &::before {
+      transform: rotate(45deg);
+    }
+    &::after {
+      transform: rotate(-45deg);
+    }
+  }
+  .has-children > a {
+    padding-right: 40px;
+    &::before, &::after {
+      /* arrow goes on the right side - children navigation */
+      right: 20px;
+      transform-origin: 9px 50%;
+    }
+  }
+
+  .go-back {
+    position: absolute;
+    left: 0;
+    height: @nav-bar-height;
+    padding-left: 40px;
+    &::before, &::after {
+      /* arrow goes on the right side - children navigation */
+      left: 20px;
+      transform-origin: 1px 50%;
     }
   }
 }
