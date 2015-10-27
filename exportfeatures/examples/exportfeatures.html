@@ -16,7 +16,8 @@
   </head>
   <body ng-controller="MainController as ctrl">
     <div id="map" ngeo-map="ctrl.map"></div>
-    <button id="save" ng-click="ctrl.saveKML()">Save KML</button>
+    <button id="save" ng-click="ctrl.exportAsKml()">Export as KML</button>
+    <input id="export" type="file" app-fileread="ctrl.fileread" />
     <p id="desc">This example shows how to use the <code>ngeo-map</code> directive to insert an OpenLayers map in a page.</p>
     <script src="lib/angular.min.js"></script>
     <script src="lib/FileSaver.min.js"></script>

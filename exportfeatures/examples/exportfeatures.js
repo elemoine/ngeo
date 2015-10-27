@@ -9,14 +9,53 @@ var app = {};
 app.module = angular.module('app', ['ngeo']);
 
 
+/**
+ * @param {angular.$window} $window The Angular window service.
+ * @return {angular.Directive} Directive Definition Object.
+ * @ngInject
+ */
+app.filereadDirective = function($window) {
+  if (!$window.FileReader) {
+    throw new Error('Browser does not support FileReader');
+  }
+  return {
+    restrict: 'A',
+    scope: {
+      'fileread': '=appFileread'
+    },
+    link:
+        /**
+         * @param {angular.Scope} scope Scope.
+         * @param {angular.JQLite} element Element.
+         * @param {angular.Attributes} attrs Attributes.
+         */
+        function(scope, element, attrs) {
+          element.bind('change', function(changeEvent) {
+            var fileReader = new FileReader();
+            fileReader.onload = function(loadEvent) {
+              scope.$apply(function() {
+                scope.fileread = loadEvent.target.result;
+              });
+            };
+            fileReader.readAsText(changeEvent.target.files[0]);
+          });
+        }
+  };
+};
+
+
+app.module.directive('appFileread', app.filereadDirective);
+
+
 
 /**
  * @constructor
+ * @param {angular.Scope} $scope Scope.
  * @param {Document} $document Document.
  * @export
  * @ngInject
  */
-app.MainController = function($document) {
+app.MainController = function($scope, $document) {
 
   /**
    * @private
@@ -58,6 +97,15 @@ app.MainController = function($document) {
     })
   });
 
+  /**
+   * @type {string}
+   * @export
+   */
+  this.fileread = '';
+
+  $scope.$watch(angular.bind(this, function() {
+    return this.fileread;
+  }), angular.bind(this, this.importKml_));
 
 };
 
@@ -65,7 +113,7 @@ app.MainController = function($document) {
 /**
  * @export
  */
-app.MainController.prototype.saveKML = function() {
+app.MainController.prototype.exportAsKml = function() {
   var features = this.vectorSource_.getFeatures();
   var kml = this.kmlFormat_.writeFeatures(features);
 
@@ -74,6 +122,17 @@ app.MainController.prototype.saveKML = function() {
   var blob = new Blob([kml], {type: type});
 
   saveAs(blob, 'file.kml');
+};
+
+
+/**
+ * @param {string} kml KML document.
+ * @private
+ */
+app.MainController.prototype.importKml_ = function(kml) {
+  var features = this.kmlFormat_.readFeatures(kml);
+  this.vectorSource_.clear(true);
+  this.vectorSource_.addFeatures(features);
 };
 
 
