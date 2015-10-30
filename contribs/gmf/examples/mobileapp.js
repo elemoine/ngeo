@@ -104,7 +104,7 @@ app.navDirective = function() {
             }));
             header.append(nav);
             window.setTimeout(function() {
-                nav.addClass('active');
+              nav.addClass('active');
             }, 0);
           }
 
