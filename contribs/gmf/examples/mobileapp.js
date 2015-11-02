@@ -66,25 +66,74 @@ app.navDirective = function() {
 
           /**
            * Stack of slid-in items.
-           * @type {Array.<jQuery>}
+           * @type {Array.<!jQuery>}
            */
           var slid = [];
 
           /**
            * Currently active sliding box.
-           * @type {Array.<jQuery>}
+           * @type {!jQuery}
            */
           var active = element.find('.active.slide');
 
+          /**
+           * The navigation header.
+           * @type {!jQuery}
+           */
           var header = element.find('> header');
 
+          /**
+           * The back button in the navigation header.
+           * @type {!jQuery}
+           */
           var backButton = element.find('header > .go-back');
 
+          // watch for clicks on "slide-in" elements
+          element.find('[data-toggle=slide-in]').on('click', function() {
+
+            // the element to slide out is the div.slide parent
+            var slideOut = $(this).parents('.slide');
+
+            // push the item to the selected stack
+            slid.push(slideOut);
+
+            // slide the "old" element out
+            slideOut.addClass('slide-out').removeClass('active');
+
+            // element to slide in
+            var slideIn = $($(this).attr('href'));
+
+            // slide the "new" element in
+            slideIn.addClass('active');
+
+            // update the navigation header
+            updateNavigationHeader(slideIn, false);
+
+            active = slideIn;
+          });
+
+          // watch for clicks on the header "go-back" link
+          backButton.click(function() {
+            // slide active item to the right
+            active.removeClass('active');
+
+            // get the previously active item
+            var slideBack = slid.pop();
+
+            // slide previous item to the right
+            slideBack.addClass('active').removeClass('slide-out');
+
+            // update the navigation header
+            updateNavigationHeader(slideBack, true);
+
+            active = slideBack;
+          });
+
           /**
+           * @param {!jQuery} active The currently active sliding box.
            * @param {boolean} back Whether to move back.
            */
-          function updateNavigationHeader(back) {
-            back = !!back;
+          function updateNavigationHeader(active, back) {
             header.toggleClass('back', back);
 
             // remove any inactive nav
@@ -98,50 +147,17 @@ app.navDirective = function() {
             backButton.toggleClass('active', slid.length > 0);
 
             // create a new nav
-            nav = $('<nav>');
+            var nav = $('<nav>');
             nav.append($('<span>', {
               text: active.attr('data-header-title')
             }));
             header.append(nav);
+
             window.setTimeout(function() {
               nav.addClass('active');
             }, 0);
           }
 
-          // watch for clicks on items with children
-          element.find('[data-toggle=slide-in]').on('click', function() {
-            // the element to slide out is the div.slide parent
-            var slideOut = $(this).parents('.slide');
-
-            // push the item to the selected stack
-            slid.push(slideOut);
-
-            // slide the element
-            slideOut.addClass('slide-out').removeClass('active');
-
-            // element to slide in
-            var slideIn = $($(this).attr('href'));
-            slideIn.addClass('active');
-            active = slideIn;
-            updateNavigationHeader();
-          });
-
-          // watch for clicks on the header "go-back" link
-          function goBack() {
-
-            // slide active item to the right
-            active.removeClass('active');
-
-            // get the previously active item
-            var slideBack = slid.pop();
-
-            // slide previous item to the right
-            slideBack.addClass('active').removeClass('slide-out');
-            active = slideBack;
-            updateNavigationHeader(true);
-          }
-
-          backButton.click(goBack);
         }
   };
 };
